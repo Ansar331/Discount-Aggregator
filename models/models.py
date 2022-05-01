@@ -18,3 +18,10 @@ class Post(BaseModel):
     title = CharField()
     description = CharField()
     discount = IntegerField()
+
+
+class User(BaseModel):
+    id = AutoField()
+    name = CharField()
+    email = CharField()
+    password = CharField()

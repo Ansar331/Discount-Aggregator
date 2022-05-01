@@ -13,7 +13,7 @@ class BaseModel(Model):
         database = db
 
 
-class Post(BaseModel):
+class User(BaseModel):
     id = AutoField()
     title = CharField()
     description = CharField()
