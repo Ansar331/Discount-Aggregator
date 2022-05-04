@@ -88,6 +88,12 @@ def signup_page():
         user = User.select().where(User.email==request.form['email']).first()
         if user:
             return render_template('static/signup.html', already_exists=True)
+        else:
+            user = User(email=request.form['email'],
+                        name=request.form['first_name'])
+            user.set_password(request.form['password'])
+            user.save()
+            return render_template('static/signin.html')
 
 
 @app.route('/create_post_page')
