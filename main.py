@@ -1,7 +1,7 @@
 #!flask/bin/python
 import json
 from flask import Flask, request, render_template
-from models import User
+from models import User, Post
 
 app = Flask(__name__)
 
@@ -76,7 +76,8 @@ def login_page():
         password = request.form['password']
         user = User.select().where(User.email==email).first()
         if user and user.check_password(password):
-            return render_template('static/main_page.html', user=user)
+            posts = Post.select()
+            return render_template('static/main_page.html', user=user, posts=posts)
         return render_template('static/signin.html')
 
 
