@@ -1,9 +1,7 @@
 #!flask/bin/python
-from flask import Flask, request, render_template
-from models.post import post_services
-from models.user import user_services
 import json
-
+from flask import Flask, request, render_template
+from models import User
 
 app = Flask(__name__)
 
@@ -65,9 +63,31 @@ def updateuser():
     return {'success': True}
 
 
-@app.route('/login_page')
+@app.route('/main_page', methods=['GET', 'POST'])
+def main_page():
+    return render_template('static/main_page.html')
+
+@app.route('/login_page', methods=['GET', 'POST'])
 def login_page():
-    return render_template('static/signin.html')
+    if request.method == 'GET':
+        return render_template('static/signin.html')
+    else:
+        email = request.form['email']
+        password = request.form['password']
+        user = User.select().where(User.email==email).first()
+        if user and user.check_password(password):
+            return render_template('static/main_page.html', user=user)
+        return render_template('static/signin.html')
+
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup_page():
+    if request.method == 'GET':
+        return render_template('static/signup.html')
+    else:
+        user = User.select().where(User.email==request.form['email']).first()
+        if user:
+            return render_template('static/signup.html', already_exists=True)
 
 
 @app.route('/create_post_page')
