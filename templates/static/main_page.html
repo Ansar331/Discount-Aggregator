@@ -1,0 +1,19 @@
+{% extends "static/base.html" %}
+
+<h1>Main page</h1>
+<h2>Hello {{ user.name }}!</h2>
+
+{% block content %}
+<h1>Записи в блоге</h1>
+{% for item in posts%}
+<div class="col-md6 border rounded">
+    <h2>{{item.title}}</h2>
+    <div>
+        {{item.description}}
+    </div>
+    <div>
+        {{item.discount}}
+    </div>
+</div>
+{% endfor %}
+{% endblock %}
