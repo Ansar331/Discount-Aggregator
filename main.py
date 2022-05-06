@@ -8,11 +8,10 @@ app = Flask(__name__)
 
 @app.route('/create_post', methods=['POST'])
 def createpost():
-    print(request.form)
     title = request.form['title']
     description = request.form['description']
     discount = request.form['discount']
-    post = post_services.create(description, discount, title)
+    post = post_services.create(title, discount, description)
     return {
         'post_id': post.id
     }
