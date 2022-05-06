@@ -62,6 +62,17 @@ def updateuser():
     post = post_services.update(id, name, email, password)
     return {'success': True}
 
+@app.route('/add_post', methods=['GET', 'POST'])
+def add_post():
+    if request.method == 'GET':
+        return render_template('static/post.html')
+    else:
+        post = Post(title=request.form['title'],
+                    description=request.form['description'],
+                    discount=request.form['discount'])
+        post.save()
+        posts = Post.select()
+        return render_template('static/main_page.html', posts=posts)
 
 @app.route('/main_page', methods=['GET', 'POST'])
 def main_page():
