@@ -1,5 +1,7 @@
 import os
 from peewee import *
+
+from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
 PROJECT_PATH = os.getenv('PROJECT_PATH', '')
@@ -14,14 +16,7 @@ class BaseModel(Model):
         database = db
 
 
-class Post(BaseModel):
-    id = AutoField()
-    title = CharField()
-    description = CharField()
-    discount = IntegerField()
-
-
-class User(BaseModel):
+class User(BaseModel, UserMixin):
     id = AutoField()
     name = CharField()
     email = CharField()
@@ -33,10 +28,19 @@ class User(BaseModel):
     def check_password(self, password):
         return check_password_hash(self.hashed_password, password)
 
+
+class Post(BaseModel):
+    id = AutoField()
+    title = CharField()
+    description = CharField()
+    discount = IntegerField()
+    title = CharField()
+    user = ForeignKeyField(User, to_field='id')
+
+
 models_list = [Post, User]
 
-def create_tables():
-    global models_list
-    for model in model_list:
-        model.create_table()
 
+def setup_database():
+    User.create_table()
+    Post.create_table()
