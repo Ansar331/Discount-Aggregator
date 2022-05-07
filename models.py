@@ -4,7 +4,7 @@ from peewee import *
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
-db_path ='/database/my_database.db'
+db_path ='database/my_database.db'
 
 db = SqliteDatabase(db_path)
 db.connect()
