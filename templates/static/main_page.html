@@ -10,7 +10,7 @@
   {% if posts %}
     {% for item in posts%}
     <div class="card mb-3">
-      <img class="card-img-top" id="post_image" width="10%  " height="10%" src="https://www.wacoisd.org/cms/lib/TX49000021/Centricity/Domain/6974/discounts-redtagsale.png" alt="Card image cap">
+      <img class="card-img-top" id="post_image" width="10%  " height="10%" src="{{ url_for('test_method', filepath=item.image_link) }}" alt="Card image cap">
       <div class="card-body">
         <h5 class="card-title">{{item.title}}</h5>
         <p class="card-text">{{item.description}}</p>

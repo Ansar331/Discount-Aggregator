@@ -2,17 +2,22 @@
 import base64
 import json
 import datetime
-from flask import g
+import os
+
+from flask import g, send_from_directory
 from flask import Flask, request, render_template
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user, session_protected
 from werkzeug.utils import redirect
-
 
 from models import User, Post
 
 app = Flask(__name__)
 app.secret_key = 'super secret key'
 app.config['SESSION_TYPE'] = 'filesystem'
+app.config['UPLOAD_FOLDER'] = 'templates/media/'
+app.config['ALLOWED_EXTENSIONS'] = ['jpg', 'png']
+app.config['MAX_CONTENT_LENGTH'] = 1000 * 1024 * 1024  # 1000mb
+
 app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(
     days=365
 )
@@ -60,10 +65,11 @@ def update_post(post_id):
         post.save()
         return redirect('/my_posts')
 
+
 @login_required
 @app.route('/delete_post/<post_id>')
 def delete_post(post_id):
-    post = Post.filter(Post.id==int(post_id)).first()
+    post = Post.filter(Post.id == int(post_id)).first()
     if not post or post.user != current_user:
         return render_template('static/404.html')
     post.delete_instance()
@@ -80,7 +86,10 @@ def createuser():
         'user_id': user.id
     }
 
-
+@app.route('/media/<path:filepath>', methods=['GET', 'POST'])
+def test_method(filepath):
+    print(filepath)
+    return send_from_directory('', filepath)
 @app.route('/delete_user')
 def deleteuser():
     id = request.json['id']
@@ -106,17 +115,22 @@ def add_post():
     if request.method == 'GET':
         return render_template('static/post.html')
     else:
+        post_photo = request.files['photoFile']
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], post_photo.filename)
+        post_photo.save(file_path)
+
         post = Post.create(discount=request.form['discount'],
                            description=request.form['description'],
                            title=request.form['title'],
-                           user=current_user)
+                           user=current_user,
+                           image_link=file_path)
         return redirect('')
 
 
 @login_required
 @app.route('/my_posts', methods=['GET', 'POST'])
 def my_posts_page():
-    my_posts = Post.select().where(Post.user==current_user)
+    my_posts = Post.select().where(Post.user == current_user)
     return render_template('static/my_posts.html', posts=my_posts)
 
 
@@ -140,7 +154,6 @@ def login_page():
             return render_template('static/main_page.html', user=user, posts=posts)
         return render_template('static/signin.html')
 
-
 @app.route('/logout')
 @login_required
 def logout():
@@ -151,6 +164,7 @@ def logout():
 @app.route('/create_post_page')
 def create_post_page():
     return render_template('static/post.html')
+
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -167,7 +181,5 @@ def signup_page():
             user.set_password(request.form['password'])
             user.save()
             return render_template('static/signin.html')
-
-
 if __name__ == '__main__':
     app.run(debug=True)

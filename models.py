@@ -36,6 +36,7 @@ class Post(BaseModel):
     discount = IntegerField()
     title = CharField()
     user = ForeignKeyField(User, to_field='id')
+    image_link = CharField()
 
 
 models_list = [Post, User]
