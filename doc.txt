@@ -1,0 +1,48 @@
+method name: /add_post, request type: POST
+
+input:
+    title - название поста
+    description - описание поста
+    discount - скида
+    image_link - местонахождение сохраненного файла, все файлы хранятся в папке media
+    user - создатель поста
+
+output:
+    если запрос был успешный то сайт перешлет вас на главную страницу
+
+
+method_name: /delete_post, request type: POST
+
+input:
+    post_id - id поста которого надо удалить
+output:
+    удаляется пост, и вы отправляетесь на главную страницу
+
+
+method_name: /update_post, request type: POST
+
+input:
+    все то что принимается в /add_post
+output:
+    после запроса вас пересылают на главную страницу
+
+
+method_name: /login_page, request type: POST
+
+input:
+    email: email пользователя
+    password: пароль от аккаунта
+
+output:
+    если успешно то вас отправляют на главную страницу, если нет то вы дальше пытаетесь зайти
+
+
+method_name: /signup, request type: POST
+
+input:
+    name: имя
+    email: почта
+    password: пароль
+
+output:
+    создает пользователя, и перекидывает на страницу логина
