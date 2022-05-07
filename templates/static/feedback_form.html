@@ -66,35 +66,27 @@ body {
     <div class="row">
         <div class="col-md-10 mx-auto">
             <div class="contact-form">
-                {% if current_user.is_authenticated %}
-                <h1 class="text-primary">Создание поста</h1>
+                <h1 class="text-primary">Обратная связь</h1>
                 <p class="hint-text">Заполните все поля</p>
-                <form action="/add_post" method="post" enctype="multipart/form-data">
+                <form action="/feedback" method="post" enctype="multipart/form-data">
                     <div class="row">
                         <div class="col-sm-4">
                             <div class="form-group">
-                                <label for="inputTitle">Названия</label>
-                                <input type="text" class="form-control" name="title" id="inputTitle" required>
+                                <label for="inputName">Ваше имя</label>
+                                <input type="text" class="form-control" name="name" id="inputName" required>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="inputDiscount">Какая скидка?</label>
-                        <input type="text" class="form-control" name="discount" id="inputDiscount" required>
+                        <label for="inputEmail">Ваша почта</label>
+                        <input type="email" class="form-control" name="email" id="inputEmail" required>
                     </div>
                     <div class="form-group">
-                        <label for="inputDescription">Описание</label>
-                        <textarea class="form-control" name="description" id="inputDescription" rows="5" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="photoFile">Фото</label>
-                        <input type="file" class="form-control" name="photoFile" id="photoFile" required/>
+                        <label for="inputMessage">Ваше сообщение</label>
+                        <textarea class="form-control" name="message" id="inputMessage" rows="5" required></textarea>
                     </div>
                     <button type="submit" class="btn bg-primary text-light"><i class="fa fa-paper-plane"></i>Отправить</button>
                 </form>
-                {% else %}
-                    Вам сперва надо авторизоваться.
-                {% endif %}
             </div>
         </div>
     </div>

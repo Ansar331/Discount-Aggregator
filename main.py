@@ -3,12 +3,14 @@ import base64
 import json
 import datetime
 import os
+import smtplib
 
 from flask import g, send_from_directory
 from flask import Flask, request, render_template
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user, session_protected
 from werkzeug.utils import redirect
 
+from config import EMAIL, EMAIL_PASSWORD
 from models import User, Post
 
 app = Flask(__name__)
@@ -27,26 +29,7 @@ login_manager.init_app(app)
 
 @login_manager.user_loader
 def load_user(user_id):
-    print('ok')
     return User.get(User.id == user_id)
-
-
-@app.route('/create_post', methods=['POST'])
-def createpost():
-    title = request.form['title']
-    description = request.form['description']
-    discount = request.form['discount']
-    post = post_services.create(title, discount, description)
-    return {
-        'post_id': post.id
-    }
-
-
-@app.route('/delete_post')
-def deletepost():
-    id = request.json['id']
-    post_services.delete(id)
-    return {'success': True}
 
 
 @login_required
@@ -76,42 +59,15 @@ def delete_post(post_id):
     return redirect('/my_posts')
 
 
-@app.route('/create_user', methods=['POST'])
-def createuser():
-    name = request.form['name']
-    email = request.form['email']
-    password = request.form['password']
-    user = user_services.create(name, email, password)
-    return {
-        'user_id': user.id
-    }
-
 @app.route('/media/<path:filepath>', methods=['GET', 'POST'])
-def test_method(filepath):
+def media_share(filepath):
     print(filepath)
     return send_from_directory('', filepath)
-@app.route('/delete_user')
-def deleteuser():
-    id = request.json['id']
-    user_services.delete(id)
-    return {'success': True}
-
-
-@app.route('/update_user')
-def updateuser():
-    id = request.json['id']
-    name = request.json['name']
-    email = request.json['email']
-    password = request.json['password']
-    post = post_services.update(id, name, email, password)
-    return {'success': True}
 
 
 @login_required
 @app.route('/add_post', methods=['GET', 'POST'])
 def add_post():
-    if not current_user.is_authenticated:
-        return render_template('static/404.html')
     if request.method == 'GET':
         return render_template('static/post.html')
     else:
@@ -154,6 +110,7 @@ def login_page():
             return render_template('static/main_page.html', user=user, posts=posts)
         return render_template('static/signin.html')
 
+
 @app.route('/logout')
 @login_required
 def logout():
@@ -166,6 +123,24 @@ def create_post_page():
     return render_template('static/post.html')
 
 
+@app.route('/feedback', methods=['GET', 'POST'])
+def feedback_page():
+    if request.method == 'GET':
+        return render_template('static/feedback_form.html')
+    else:
+        try:
+            smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+            smtp_server.ehlo()
+            print(EMAIL, EMAIL_PASSWORD)
+            smtp_server.login(EMAIL, EMAIL_PASSWORD)
+            print(request.form['email'], request.form['message'])
+            smtp_server.sendmail(request.form['email'], 'tiplar85@gmail.com', request.form['message'])
+            smtp_server.close()
+        except Exception as ex:
+            print(ex)
+            return redirect('static/404.html')
+    return redirect('/feedback')
+
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup_page():
@@ -174,12 +149,14 @@ def signup_page():
     else:
         user = User.select().where(User.email == request.form['email']).first()
         if user:
-            return render_template('static/signup.html', already_exists=True)
+            return render_template('static/signin.html', already_exists=True)
         else:
             user = User(email=request.form['email'],
                         name=request.form['first_name'])
             user.set_password(request.form['password'])
             user.save()
             return render_template('static/signin.html')
+
+
 if __name__ == '__main__':
     app.run(debug=True)
